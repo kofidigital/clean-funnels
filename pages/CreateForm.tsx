@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Button } from '../components/UIComponents';
+import { Button, Input } from '../components/UIComponents';
 import { 
   CornerDownLeft, RefreshCcw, GitBranch, ArrowRight, Sparkles, Check, 
   Calendar, Send, User, Mail, ChevronRight, Settings2, 
@@ -34,6 +34,10 @@ export const CreateFormPage: React.FC<{ setPage: (p: Page) => void }> = ({ setPa
   // Context-Aware Intake State
   const [contextData, setContextData] = useState<IntakeContext>(DEFAULT_CONTEXT);
   const [isContextModalOpen, setIsContextModalOpen] = useState(false);
+  
+  // URL Import State
+  const [importUrl, setImportUrl] = useState('');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   
   // Nudge Modal State
   const [showNudge, setShowNudge] = useState(false);
@@ -78,12 +82,39 @@ export const CreateFormPage: React.FC<{ setPage: (p: Page) => void }> = ({ setPa
 
   const openContextModal = () => {
     setTempContext({ ...contextData });
+    setImportUrl('');
     setIsContextModalOpen(true);
   };
 
   const saveContext = () => {
     setContextData({ ...tempContext });
     setIsContextModalOpen(false);
+  };
+
+  const handleAnalyzePage = () => {
+    if (!importUrl) return;
+    setIsAnalyzing(true);
+    
+    // Simulate API Analysis
+    setTimeout(() => {
+      setIsAnalyzing(false);
+      
+      // Smart matching logic for demo purposes
+      let detectedPage = tempContext.landingPage;
+      if (importUrl.includes('pricing')) detectedPage = '/pricing';
+      else if (importUrl.includes('demo')) detectedPage = '/book-demo';
+      else if (importUrl.includes('webinar')) detectedPage = '/webinar';
+      else detectedPage = '/landing-a'; // Fallback for demo
+
+      setTempContext({
+        ...tempContext,
+        landingPage: detectedPage,
+        offerPromise: 'Save 20+ hours per week on lead qualification.',
+        persona: 'Founders',
+        intentLevel: 3, // High intent inferred
+        features: ['tailored_questions', 'priority_scoring', 'inferred_pain_points']
+      });
+    }, 1500);
   };
 
   // Wrapper that decides whether to show nudge or generate
@@ -233,7 +264,7 @@ export const CreateFormPage: React.FC<{ setPage: (p: Page) => void }> = ({ setPa
         
         {/* CONTEXT BAR (Always Visible at Top) */}
         <div className="absolute top-0 left-0 right-0 h-16 px-8 flex items-center justify-between z-50 pointer-events-none">
-           <div className="flex items-center gap-3 bg-surface/40 backdrop-blur-md border border-white/5 pr-4 pl-3 py-1.5 rounded-full transition-all hover:bg-surface/60 hover:border-white/10 pointer-events-auto">
+           <div className="flex items-center gap-3 bg-surface/40 backdrop-blur-md border border-white/5 pr-4 pl-3 py-1.5 rounded-full transition-all hover:bg-surface/60 hover:border-white/10 pointer-events-auto shadow-glass">
               <div className="w-6 h-6 rounded-full bg-panel flex items-center justify-center border border-borderSubtle text-textTertiary">
                  <Settings2 size={12} />
               </div>
@@ -366,145 +397,191 @@ export const CreateFormPage: React.FC<{ setPage: (p: Page) => void }> = ({ setPa
                     </div>
 
                     {/* Body */}
-                    <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6">
+                    <div className="flex-1 overflow-y-auto custom-scrollbar">
                         
-                        {/* A. Landing Page */}
-                        <div className="space-y-2">
-                             <label className="text-[11px] font-medium text-textMain flex items-center gap-2">
-                                <Globe size={12} className="text-textTertiary" /> Landing Page / Location
-                             </label>
-                             <div className="relative">
-                                <select 
-                                    value={tempContext.landingPage}
-                                    onChange={(e) => setTempContext({...tempContext, landingPage: e.target.value})}
-                                    className="w-full bg-surface border border-borderSubtle rounded-lg px-3 py-2.5 text-[13px] text-textMain focus:outline-none focus:border-borderHighlight appearance-none"
-                                >
-                                    <option value="" disabled>Select a page...</option>
-                                    <option value="/pricing">/pricing</option>
-                                    <option value="/book-demo">/book-demo</option>
-                                    <option value="/webinar">/webinar-registration</option>
-                                    <option value="/landing-a">/landing-page-a</option>
-                                </select>
-                                <div className="absolute right-3 top-3 pointer-events-none text-textTertiary">
-                                    <ChevronRight size={14} className="rotate-90" />
+                        {/* SECTION 1: URL IMPORT */}
+                        <div className="p-6 bg-surfaceHighlight/5 border-b border-borderSubtle space-y-3">
+                            <label className="text-[12px] font-medium text-textMain flex items-center gap-2">
+                                Import context from URL <span className="text-textTertiary font-normal">(recommended)</span>
+                            </label>
+                            <div className="flex gap-2">
+                                <div className="relative flex-1">
+                                    <div className="absolute left-3 top-2.5 text-textTertiary pointer-events-none">
+                                        <Globe size={14} />
+                                    </div>
+                                    <Input 
+                                        placeholder="https://yourpage.com" 
+                                        value={importUrl}
+                                        onChange={(e) => setImportUrl(e.target.value)}
+                                        className="pl-9 h-9"
+                                    />
                                 </div>
-                             </div>
+                                <Button 
+                                    variant="secondary" 
+                                    onClick={handleAnalyzePage} 
+                                    disabled={isAnalyzing || !importUrl}
+                                    icon={isAnalyzing ? <RefreshCcw className="animate-spin" size={14}/> : <Sparkles size={14}/>}
+                                    className="h-9 px-4"
+                                >
+                                    {isAnalyzing ? 'Analyzing...' : 'Analyze Page'}
+                                </Button>
+                            </div>
+                            <p className="text-[11px] text-textTertiary">Clean Funnels will scan your page and populate the fields below automatically.</p>
                         </div>
 
-                        {/* B. Offer Promise */}
-                        <div className="space-y-2">
-                             <label className="text-[11px] font-medium text-textMain flex items-center gap-2">
-                                <Sparkles size={12} className="text-textTertiary" /> Offer Promise
-                             </label>
-                             <input 
-                                type="text"
-                                value={tempContext.offerPromise}
-                                onChange={(e) => setTempContext({...tempContext, offerPromise: e.target.value})}
-                                placeholder="What does this page promise? (e.g. Save 20 hours/week)"
-                                className="w-full bg-surface border border-borderSubtle rounded-lg px-3 py-2.5 text-[13px] text-textMain focus:outline-none focus:border-borderHighlight placeholder:text-textTertiary"
-                             />
+                        {/* SEPARATOR */}
+                        <div className="relative py-2 flex items-center justify-center bg-page">
+                            <div className="absolute inset-0 flex items-center px-6"><div className="w-full border-t border-borderSubtle"></div></div>
+                            <span className="relative bg-[#0A0A0A] px-3 text-[10px] text-textTertiary uppercase tracking-wide font-medium">Or fill in manually</span>
                         </div>
 
-                        {/* C. Audience Persona */}
-                        <div className="space-y-3">
-                             <label className="text-[11px] font-medium text-textMain flex items-center gap-2">
-                                <UsersIcon size={12} className="text-textTertiary" /> Audience Persona
-                             </label>
-                             <div className="grid grid-cols-2 gap-2">
-                                {['Founders', 'Marketers', 'Agencies', 'Custom'].map((p) => (
-                                    <button
-                                        key={p}
-                                        onClick={() => setTempContext({...tempContext, persona: p})}
-                                        className={`px-3 py-2 rounded-lg border text-[12px] font-medium transition-all text-left ${
-                                            tempContext.persona === p 
-                                            ? 'bg-textMain text-page border-textMain' 
-                                            : 'bg-surface border-borderSubtle text-textSecondary hover:border-textSecondary'
-                                        }`}
-                                    >
-                                        {p}
-                                    </button>
-                                ))}
-                             </div>
-                             {tempContext.persona === 'Custom' && (
-                                <input 
-                                    type="text"
-                                    value={tempContext.personaCustom}
-                                    onChange={(e) => setTempContext({...tempContext, personaCustom: e.target.value})}
-                                    placeholder="Describe your audience..."
-                                    className="w-full bg-surface border border-borderSubtle rounded-lg px-3 py-2 text-[12px] text-textMain focus:outline-none focus:border-borderHighlight animate-slide-up"
-                                    autoFocus
-                                />
-                             )}
-                        </div>
-
-                        {/* D. Intent Level */}
-                        <div className="space-y-4">
-                             <div className="flex justify-between items-center">
+                        {/* SECTION 2: MANUAL FIELDS */}
+                        <div className="p-6 space-y-6">
+                            {/* A. Landing Page */}
+                            <div className="space-y-2">
                                 <label className="text-[11px] font-medium text-textMain flex items-center gap-2">
-                                    <Target size={12} className="text-textTertiary" /> Intent Level
+                                    <Globe size={12} className="text-textTertiary" /> Landing Page / Location
                                 </label>
-                                <span className="text-[10px] text-textSecondary bg-surface border border-borderSubtle px-2 py-0.5 rounded">
-                                    {tempContext.intentLevel === 1 ? 'Low' : tempContext.intentLevel === 2 ? 'Medium' : 'High'}
-                                </span>
-                             </div>
-                             <div className="relative h-6 flex items-center">
-                                <div className="absolute inset-x-0 h-1 bg-surface border border-borderSubtle rounded-full"></div>
-                                <input 
-                                    type="range" 
-                                    min="1" 
-                                    max="3" 
-                                    step="1"
-                                    value={tempContext.intentLevel}
-                                    onChange={(e) => setTempContext({...tempContext, intentLevel: parseInt(e.target.value)})}
-                                    className="w-full relative z-10 opacity-0 cursor-pointer"
+                                <p className="text-[10px] text-textTertiary">Which page or funnel step is this intake attached to?</p>
+                                <div className="relative">
+                                    <select 
+                                        value={tempContext.landingPage}
+                                        onChange={(e) => setTempContext({...tempContext, landingPage: e.target.value})}
+                                        className="w-full bg-surface border border-borderSubtle rounded-lg px-3 py-2.5 text-[13px] text-textMain focus:outline-none focus:border-borderHighlight appearance-none transition-colors"
+                                    >
+                                        <option value="" disabled>Select a page...</option>
+                                        <option value="/pricing">/pricing</option>
+                                        <option value="/book-demo">/book-demo</option>
+                                        <option value="/webinar">/webinar-registration</option>
+                                        <option value="/landing-a">/landing-page-a</option>
+                                    </select>
+                                    <div className="absolute right-3 top-3 pointer-events-none text-textTertiary">
+                                        <ChevronRight size={14} className="rotate-90" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* B. Offer Promise */}
+                            <div className="space-y-2">
+                                <label className="text-[11px] font-medium text-textMain flex items-center gap-2">
+                                    <Sparkles size={12} className="text-textTertiary" /> Offer Promise
+                                </label>
+                                <Input 
+                                    type="text"
+                                    value={tempContext.offerPromise}
+                                    onChange={(e) => setTempContext({...tempContext, offerPromise: e.target.value})}
+                                    placeholder="What is this page promising? (e.g., Save 20 hours/week)"
+                                    className="bg-surface"
                                 />
-                                <div 
-                                    className="absolute h-4 w-4 bg-textMain rounded-full border-2 border-page shadow-sm transition-all pointer-events-none"
-                                    style={{ left: `${(tempContext.intentLevel - 1) * 50}%`, transform: 'translateX(-50%)' }}
-                                />
-                                <div className="absolute inset-0 flex justify-between pointer-events-none px-0.5">
-                                    {[1, 2, 3].map(i => (
-                                        <div key={i} className={`w-1 h-1 rounded-full mt-1.5 ${i <= tempContext.intentLevel ? 'bg-textMain' : 'bg-borderSubtle'}`} />
+                            </div>
+
+                            {/* C. Audience Persona */}
+                            <div className="space-y-3">
+                                <div>
+                                    <label className="text-[11px] font-medium text-textMain flex items-center gap-2">
+                                        <UsersIcon size={12} className="text-textTertiary" /> Audience Persona
+                                    </label>
+                                    <p className="text-[10px] text-textTertiary mt-0.5">Who is this page designed for?</p>
+                                </div>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {['Founders', 'Marketers', 'Agencies', 'Custom'].map((p) => (
+                                        <button
+                                            key={p}
+                                            onClick={() => setTempContext({...tempContext, persona: p})}
+                                            className={`px-3 py-2 rounded-lg border text-[12px] font-medium transition-all text-left ${
+                                                tempContext.persona === p 
+                                                ? 'bg-textMain text-page border-textMain' 
+                                                : 'bg-surface border-borderSubtle text-textSecondary hover:border-textSecondary'
+                                            }`}
+                                        >
+                                            {p}
+                                        </button>
                                     ))}
                                 </div>
-                             </div>
-                             <div className="flex justify-between text-[10px] text-textTertiary">
-                                <span>Curiosity</span>
-                                <span>Considering</span>
-                                <span>Ready to Buy</span>
-                             </div>
-                        </div>
+                                {tempContext.persona === 'Custom' && (
+                                    <input 
+                                        type="text"
+                                        value={tempContext.personaCustom}
+                                        onChange={(e) => setTempContext({...tempContext, personaCustom: e.target.value})}
+                                        placeholder="Describe your audience..."
+                                        className="w-full bg-surface border border-borderSubtle rounded-lg px-3 py-2 text-[12px] text-textMain focus:outline-none focus:border-borderHighlight animate-slide-up"
+                                        autoFocus
+                                    />
+                                )}
+                            </div>
 
-                        {/* E. AI Behavior */}
-                        <div className="space-y-3">
-                             <label className="text-[11px] font-medium text-textMain flex items-center gap-2">
-                                <Zap size={12} className="text-textTertiary" /> AI Behavior
-                             </label>
-                             <div className="space-y-2">
-                                {[
-                                    { id: 'tailored_questions', label: 'Tailored Questions', desc: 'Adapt tone to the persona.' },
-                                    { id: 'inferred_pain_points', label: 'Infer Pain Points', desc: 'Guess problems based on role.' },
-                                    { id: 'priority_scoring', label: 'Priority Scoring', desc: 'Boost score for decision makers.' },
-                                    { id: 'personalized_success', label: 'Personalized Success', desc: 'Custom message at the end.' },
-                                ].map((feature) => {
-                                    const isSelected = tempContext.features.includes(feature.id);
-                                    return (
-                                        <div 
-                                            key={feature.id}
-                                            onClick={() => toggleFeature(feature.id)}
-                                            className="flex items-start gap-3 p-2 rounded hover:bg-surfaceHighlight/30 cursor-pointer transition-colors group"
-                                        >
-                                            <div className={`mt-0.5 transition-colors ${isSelected ? 'text-textMain' : 'text-textTertiary group-hover:text-textSecondary'}`}>
-                                                {isSelected ? <CheckSquare size={14} /> : <Square size={14} />}
+                            {/* D. Intent Level */}
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-center">
+                                    <div>
+                                        <label className="text-[11px] font-medium text-textMain flex items-center gap-2">
+                                            <Target size={12} className="text-textTertiary" /> Intent Level
+                                        </label>
+                                        <p className="text-[10px] text-textTertiary mt-0.5">How intent-heavy is this page?</p>
+                                    </div>
+                                    <span className="text-[10px] text-textSecondary bg-surface border border-borderSubtle px-2 py-0.5 rounded">
+                                        {tempContext.intentLevel === 1 ? 'Low' : tempContext.intentLevel === 2 ? 'Medium' : 'High'}
+                                    </span>
+                                </div>
+                                <div className="relative h-6 flex items-center mt-2">
+                                    <div className="absolute inset-x-0 h-1 bg-surface border border-borderSubtle rounded-full"></div>
+                                    <input 
+                                        type="range" 
+                                        min="1" 
+                                        max="3" 
+                                        step="1"
+                                        value={tempContext.intentLevel}
+                                        onChange={(e) => setTempContext({...tempContext, intentLevel: parseInt(e.target.value)})}
+                                        className="w-full relative z-10 opacity-0 cursor-pointer"
+                                    />
+                                    <div 
+                                        className="absolute h-4 w-4 bg-textMain rounded-full border-2 border-page shadow-sm transition-all pointer-events-none"
+                                        style={{ left: `${(tempContext.intentLevel - 1) * 50}%`, transform: 'translateX(-50%)' }}
+                                    />
+                                    <div className="absolute inset-0 flex justify-between pointer-events-none px-0.5">
+                                        {[1, 2, 3].map(i => (
+                                            <div key={i} className={`w-1 h-1 rounded-full mt-1.5 ${i <= tempContext.intentLevel ? 'bg-textMain' : 'bg-borderSubtle'}`} />
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="flex justify-between text-[10px] text-textTertiary">
+                                    <span>Curiosity</span>
+                                    <span>Considering</span>
+                                    <span>Ready to Buy</span>
+                                </div>
+                            </div>
+
+                            {/* E. AI Behavior */}
+                            <div className="space-y-4 pt-2">
+                                <label className="text-[11px] font-medium text-textMain flex items-center gap-2">
+                                    <Zap size={12} className="text-textTertiary" /> AI Behavior
+                                </label>
+                                <div className="space-y-3">
+                                    {[
+                                        { id: 'tailored_questions', label: 'Tailored Questions', desc: 'Tune tone and questions to the selected persona.' },
+                                        { id: 'inferred_pain_points', label: 'Infer Pain Points', desc: 'Guess likely frustrations based on persona and promise.' },
+                                        { id: 'priority_scoring', label: 'Priority Scoring', desc: 'Boost higher-intent responses for sales visibility.' },
+                                        { id: 'personalized_success', label: 'Personalized Success', desc: 'Auto-generate a custom final message.' },
+                                    ].map((feature) => {
+                                        const isSelected = tempContext.features.includes(feature.id);
+                                        return (
+                                            <div 
+                                                key={feature.id}
+                                                onClick={() => toggleFeature(feature.id)}
+                                                className="flex items-start gap-3 p-2.5 -mx-2.5 rounded-lg hover:bg-surfaceHighlight/30 cursor-pointer transition-colors group"
+                                            >
+                                                <div className={`mt-0.5 transition-colors ${isSelected ? 'text-textMain' : 'text-textTertiary group-hover:text-textSecondary'}`}>
+                                                    {isSelected ? <CheckSquare size={14} /> : <Square size={14} />}
+                                                </div>
+                                                <div>
+                                                    <div className={`text-[12px] font-medium transition-colors ${isSelected ? 'text-textMain' : 'text-textSecondary'}`}>{feature.label}</div>
+                                                    <div className="text-[10px] text-textTertiary mt-0.5">{feature.desc}</div>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <div className={`text-[12px] font-medium transition-colors ${isSelected ? 'text-textMain' : 'text-textSecondary'}`}>{feature.label}</div>
-                                                <div className="text-[10px] text-textTertiary">{feature.desc}</div>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                             </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
                         </div>
 
                     </div>
