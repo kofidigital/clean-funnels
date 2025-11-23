@@ -1,0 +1,124 @@
+
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CleanFunnels</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+              mono: ['JetBrains Mono', 'monospace'],
+            },
+            colors: {
+              // Ultra Premium Dark Palette
+              page: '#0A0A0A',       // Deepest Black
+              surface: '#141414',    // Card Background
+              panel: '#111111',      // Sidebar / Secondary Panels
+              
+              // Borders - Ultra Subtle
+              borderSubtle: 'rgba(255,255,255,0.06)',
+              borderHighlight: 'rgba(255,255,255,0.12)',
+              
+              // Typography
+              textMain: '#EDEDED',    // Almost White
+              textSecondary: '#A1A1AA', // Zinc 400
+              textTertiary: '#52525B',  // Zinc 600
+
+              // Accents (Minimal)
+              accent: {
+                primary: '#EDEDED',   // White for primary actions
+                hover: '#FAFAFA',     // Zinc 50
+                blue: '#3B82F6',      // Subtle blue for focus
+              },
+              
+              // Surface Highlights
+              surfaceHighlight: '#1C1C1C',
+            },
+            boxShadow: {
+              'glass': '0 0 0 1px rgba(255,255,255,0.05), 0 1px 2px rgba(0,0,0,0.2)',
+              'card': '0 0 0 1px rgba(255,255,255,0.04), 0 2px 4px rgba(0,0,0,0.2)',
+              'card-hover': '0 0 0 1px rgba(255,255,255,0.1), 0 8px 20px -4px rgba(0,0,0,0.4)',
+              'modal': '0 0 0 1px rgba(255,255,255,0.08), 0 24px 48px -12px rgba(0,0,0,0.7)',
+              'glow': '0 0 24px -8px rgba(255, 255, 255, 0.08)',
+            },
+            animation: {
+              'fade-in': 'fadeIn 0.2s ease-out forwards', // Faster, tighter animation
+              'slide-up': 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+            },
+            keyframes: {
+              fadeIn: {
+                '0%': { opacity: '0' },
+                '100%': { opacity: '1' },
+              },
+              slideUp: {
+                '0%': { opacity: '0', transform: 'translateY(8px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              }
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+      body {
+        background-color: #0A0A0A;
+        color: #EDEDED;
+        -webkit-font-smoothing: antialiased;
+        font-size: 13px; /* Reduced base size */
+        line-height: 1.5;
+      }
+      /* Minimal Scrollbar */
+      ::-webkit-scrollbar {
+        width: 5px;
+        height: 5px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #27272A;
+        border-radius: 3px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #3F3F46;
+      }
+      
+      .glass-panel {
+        background: rgba(10, 10, 10, 0.7);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+      
+      input::placeholder, textarea::placeholder {
+        opacity: 0.5;
+      }
+      
+      /* Disable bounce on scroll for "app-like" feel */
+      html, body {
+        overscroll-behavior-y: none;
+      }
+    </style>
+    <script type="importmap">
+    {
+      "imports": {
+        "lucide-react": "https://aistudiocdn.com/lucide-react@^0.554.0",
+        "react/": "https://aistudiocdn.com/react@^19.2.0/",
+        "react": "https://aistudiocdn.com/react@^19.2.0",
+        "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/"
+      }
+    }
+    </script>
+</head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
